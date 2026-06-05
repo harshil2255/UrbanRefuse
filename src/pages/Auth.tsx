@@ -61,7 +61,7 @@ export default function Auth() {
           <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
             <Leaf size={32} className="text-white" />
           </div>
-          <span className="text-2xl font-bold tracking-tight">CivicSense</span>
+          <span className="text-xl font-bold tracking-tight">Urban Refuse Tracking & Management System</span>
         </div>
         
         <div className="relative z-10 max-w-lg animate-fade-in">
@@ -74,7 +74,7 @@ export default function Auth() {
         </div>
         
         <div className="relative z-10 text-sm opacity-75">
-          &copy; {new Date().getFullYear()} CivicSense Platform. All rights reserved.
+          &copy; {new Date().getFullYear()} Urban Refuse Tracking & Management System. All rights reserved.
         </div>
       </div>
 
@@ -88,7 +88,7 @@ export default function Auth() {
             <div className="bg-emerald-600 p-2 rounded-xl shadow-lg shadow-emerald-600/30">
               <Leaf size={28} className="text-white" />
             </div>
-            <span className="text-3xl font-bold text-slate-800 tracking-tight">CivicSense</span>
+            <span className="text-xl font-bold text-slate-800 tracking-tight">Urban Refuse Tracking & Management System</span>
           </div>
 
           <div className="mb-8">

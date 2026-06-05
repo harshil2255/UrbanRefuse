@@ -43,7 +43,7 @@ export default function AppLayout() {
           <div className="flex items-center space-x-8">
             <div className="flex items-center space-x-2 text-emerald-600 dark:text-emerald-500">
               <Trash2 size={28} />
-              <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">CivicSense</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white tracking-tight leading-tight">Urban Refuse Tracking &<br/>Management System</span>
             </div>
             
             {/* Navigation Links */}
