@@ -36,7 +36,7 @@ export default function AppLayout() {
     }`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-slate-50 to-teal-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/30 flex flex-col font-['Outfit'] transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:20px_20px] flex flex-col font-['Outfit'] transition-colors">
       {/* Top Header */}
       <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm sticky top-0 z-40 border-b border-gray-100 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
