@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import CollectorDashboard from './pages/CollectorDashboard';
 import Settings from './pages/Settings';
 import ComplaintDetails from './pages/ComplaintDetails';
+import Leaderboard from './pages/Leaderboard';
 
 import UpdatePassword from './pages/UpdatePassword';
 
@@ -22,6 +23,7 @@ function App() {
             <Route index element={<CivicFeed />} />
             <Route path="complaint/:id" element={<ComplaintDetails />} />
             <Route path="map" element={<MapView />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
             <Route path="admin" element={<AdminDashboard />} />
             <Route path="collector" element={<CollectorDashboard />} />
             <Route path="settings" element={<Settings />} />

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet, Navigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Trash2, Map, LayoutList, Shield, ClipboardList, Settings as SettingsIcon } from 'lucide-react';
+import { Trash2, Map, LayoutList, Shield, ClipboardList, Settings as SettingsIcon, Trophy } from 'lucide-react';
 
 export default function AppLayout() {
   const { user, profile, loading } = useAuth();
@@ -58,6 +58,11 @@ export default function AppLayout() {
                 <span>Map</span>
               </NavLink>
 
+              <NavLink to="/leaderboard" className={navClass}>
+                <Trophy size={18} />
+                <span>Leaderboard</span>
+              </NavLink>
+
               {profile?.role === 'admin' && (
                 <NavLink to="/admin" className={navClass}>
                   <Shield size={18} />
@@ -103,6 +108,10 @@ export default function AppLayout() {
             <NavLink to="/map" className={navClass}>
               <Map size={18} />
               <span>Map</span>
+            </NavLink>
+            <NavLink to="/leaderboard" className={navClass}>
+              <Trophy size={18} />
+              <span>Rankings</span>
             </NavLink>
             {profile?.role === 'admin' && (
               <NavLink to="/admin" className={navClass}>
