@@ -3,6 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { MapPin, Clock, ArrowLeft, MessageSquare, ThumbsUp, Send } from 'lucide-react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix for default marker icon in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 export default function ComplaintDetails() {
   const { id } = useParams<{ id: string }>();
@@ -125,9 +136,9 @@ export default function ComplaintDetails() {
                 {complaint.status}
               </span>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{complaint.category}</h1>
-              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4">
-                <span className="flex items-center"><Clock size={14} className="mr-1" /> {new Date(complaint.created_at).toLocaleDateString()}</span>
-                <span className="flex items-center"><MapPin size={14} className="mr-1 text-emerald-500" /> {complaint.location_lat.toFixed(4)}, {complaint.location_lng.toFixed(4)}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-500 dark:text-gray-400 space-y-2 sm:space-y-0 sm:space-x-4">
+                <span className="flex items-center"><Clock size={14} className="mr-1.5" /> {new Date(complaint.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="flex items-center"><MapPin size={14} className="mr-1.5 text-emerald-500" /> Exact Location Tagged</span>
               </div>
             </div>
             
@@ -146,6 +157,25 @@ export default function ComplaintDetails() {
 
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-6 bg-gray-50 dark:bg-slate-900/50 p-3 rounded-lg inline-flex">
             Reported by <strong className="ml-1 text-gray-900 dark:text-gray-200">{complaint.profiles?.full_name || 'Citizen'}</strong>
+          </div>
+
+          {/* Interactive Map */}
+          <div className="mb-6 space-y-2">
+            <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wider">Location</h3>
+            <div className="h-64 w-full rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 relative z-0">
+              <MapContainer 
+                center={[complaint.location_lat, complaint.location_lng]} 
+                zoom={16} 
+                className="h-full w-full"
+                scrollWheelZoom={false}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={[complaint.location_lat, complaint.location_lng]} />
+              </MapContainer>
+            </div>
           </div>
 
           {/* Before & After Photos */}
