@@ -38,9 +38,13 @@ export default function AppLayout() {
     }`;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:20px_20px] flex flex-col font-['Outfit'] transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] flex flex-col font-['Outfit'] transition-colors relative overflow-x-hidden">
+      {/* Ambient Background Glows */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-400/20 dark:bg-emerald-900/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-teal-400/20 dark:bg-teal-900/30 rounded-full blur-[100px] pointer-events-none z-0"></div>
+
       {/* Top Header */}
-      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm sticky top-0 z-40 border-b border-gray-100 dark:border-slate-800 transition-colors">
+      <header className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-sm sticky top-0 z-40 border-b border-gray-200/50 dark:border-slate-800/50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-8">
             <div className="flex items-center space-x-2 text-emerald-600 dark:text-emerald-500">
@@ -131,7 +135,7 @@ export default function AppLayout() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full relative z-0">
+      <main className="flex-1 w-full relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
