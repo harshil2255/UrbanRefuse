@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Shield, MapPin, Trash2, Users } from 'lucide-react';
+import { Shield, MapPin, Trash2, Users, ArrowUpDown } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [complaints, setComplaints] = useState<any[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'dustbins'>('overview');
+  
+  // Overview Filters
+  const [filter, setFilter] = useState<'all' | 'resolved' | 'unresolved'>('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   
   // New Dustbin Form
   const [lat, setLat] = useState('');
@@ -20,7 +24,7 @@ export default function AdminDashboard() {
   const fetchComplaints = async () => {
     const { data } = await supabase
       .from('complaints')
-      .select('*, profiles!complaints_creator_id_fkey(full_name), collector:profiles!complaints_assigned_collector_id_fkey(full_name)')
+      .select('*, profiles!complaints_creator_id_fkey(full_name, email), collector:profiles!complaints_assigned_collector_id_fkey(full_name)')
       .order('created_at', { ascending: false });
     if (data) setComplaints(data);
   };
@@ -62,6 +66,20 @@ export default function AdminDashboard() {
     }
   };
 
+  const displayedComplaints = complaints
+    .filter(c => {
+      if (filter === 'resolved') return c.status === 'Resolved';
+      if (filter === 'unresolved') return c.status !== 'Resolved';
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'newest') {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      } else {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      }
+    });
+
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-8 animate-fade-in font-['Outfit'] transition-colors">
       <div className="flex items-center space-x-3 mb-2">
@@ -94,8 +112,30 @@ export default function AdminDashboard() {
       {/* Tab: Overview */}
       {activeTab === 'overview' && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">All Reports</h2>
+            
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+              {/* Filter */}
+              <div className="flex bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-1 shadow-sm">
+                <button onClick={() => setFilter('all')} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${filter === 'all' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}>All</button>
+                <button onClick={() => setFilter('unresolved')} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${filter === 'unresolved' ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}>Unresolved</button>
+                <button onClick={() => setFilter('resolved')} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${filter === 'resolved' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}>Resolved</button>
+              </div>
+              
+              {/* Sort */}
+              <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm">
+                <ArrowUpDown size={14} className="text-gray-400 mr-2" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="bg-transparent text-xs font-medium text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer appearance-none pr-4"
+                >
+                  <option value="newest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Newest First</option>
+                  <option value="oldest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Oldest First</option>
+                </select>
+              </div>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
@@ -104,11 +144,12 @@ export default function AdminDashboard() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reported By</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email ID</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Collector</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-                {complaints.map((complaint) => (
+                {displayedComplaints.map((complaint) => (
                   <tr key={complaint.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -126,6 +167,9 @@ export default function AdminDashboard() {
                       {complaint.profiles?.full_name || 'Citizen'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {complaint.profiles?.email || <span className="italic opacity-50">Not Synced</span>}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {complaint.collector ? (
                         <span className="text-emerald-600 dark:text-emerald-400 font-medium">{complaint.collector.full_name}</span>
                       ) : (
@@ -136,7 +180,7 @@ export default function AdminDashboard() {
                 ))}
               </tbody>
             </table>
-            {complaints.length === 0 && (
+            {displayedComplaints.length === 0 && (
               <div className="p-8 text-center text-gray-500 dark:text-gray-400">No reports found.</div>
             )}
           </div>
