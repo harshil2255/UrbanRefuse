@@ -8,6 +8,8 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -19,7 +21,13 @@ export default function Auth() {
     setError(null);
 
     try {
-      if (isLogin) {
+      if (isForgotPassword) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/update-password`,
+        });
+        if (error) throw error;
+        setResetSent(true);
+      } else if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -93,15 +101,30 @@ export default function Auth() {
 
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-slate-900 mb-2">
-              {isLogin ? 'Welcome back' : 'Create an account'}
+              {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome back' : 'Create an account'}
             </h2>
             <p className="text-slate-500">
-              {isLogin ? 'Enter your details to access your dashboard.' : 'Sign up to start reporting issues in your area.'}
+              {isForgotPassword 
+                ? "Enter your email and we'll send you a recovery link." 
+                : isLogin ? 'Enter your details to access your dashboard.' : 'Sign up to start reporting issues in your area.'}
             </p>
           </div>
 
-          <form onSubmit={handleAuth} className="space-y-5">
-            {!isLogin && (
+          {resetSent ? (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-6 rounded-xl text-center">
+              <h3 className="font-bold mb-2">Check your inbox</h3>
+              <p className="text-sm">We've sent a password reset link to <strong>{email}</strong>.</p>
+              <button 
+                onClick={() => { setIsForgotPassword(false); setResetSent(false); }}
+                className="mt-4 text-emerald-600 font-semibold text-sm hover:underline"
+              >
+                Back to login
+              </button>
+            </div>
+          ) : (
+            <>
+              <form onSubmit={handleAuth} className="space-y-5">
+                {!isLogin && !isForgotPassword && (
               <div className="group">
                 <label className="block text-sm font-medium text-slate-700 mb-1.5 transition-colors group-focus-within:text-emerald-600">Full Name</label>
                 <input
@@ -127,17 +150,30 @@ export default function Auth() {
               />
             </div>
 
-            <div className="group">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5 transition-colors group-focus-within:text-emerald-600">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
-              />
-            </div>
+            {!isForgotPassword && (
+              <div className="group">
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-sm font-medium text-slate-700 transition-colors group-focus-within:text-emerald-600">Password</label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => { setIsForgotPassword(true); setError(null); }}
+                      className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+                />
+              </div>
+            )}
 
             {error && (
               <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600 flex items-start animate-fade-in">
@@ -162,7 +198,7 @@ export default function Auth() {
                 </>
               ) : (
                 <>
-                  {isLogin ? 'Sign in' : 'Create account'}
+                  {isForgotPassword ? 'Send Recovery Link' : isLogin ? 'Sign in' : 'Create account'}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
@@ -170,20 +206,37 @@ export default function Auth() {
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-slate-500">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-              <button
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError(null);
-                }}
-                className="font-semibold text-emerald-600 hover:text-emerald-500 transition-colors"
-              >
-                {isLogin ? 'Sign up' : 'Sign in'}
-              </button>
-            </p>
+            {isForgotPassword ? (
+              <p className="text-sm text-slate-500">
+                Remember your password?{' '}
+                <button
+                  onClick={() => {
+                    setIsForgotPassword(false);
+                    setError(null);
+                  }}
+                  className="font-semibold text-emerald-600 hover:text-emerald-500 transition-colors"
+                >
+                  Sign in
+                </button>
+              </p>
+            ) : (
+              <p className="text-sm text-slate-500">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
+                <button
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setError(null);
+                  }}
+                  className="font-semibold text-emerald-600 hover:text-emerald-500 transition-colors"
+                >
+                  {isLogin ? 'Sign up' : 'Sign in'}
+                </button>
+              </p>
+            )}
           </div>
-        </div>
+        </>
+      )}
+    </div>
       </div>
     </div>
   );

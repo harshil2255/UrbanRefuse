@@ -9,12 +9,15 @@ import CollectorDashboard from './pages/CollectorDashboard';
 import Settings from './pages/Settings';
 import ComplaintDetails from './pages/ComplaintDetails';
 
+import UpdatePassword from './pages/UpdatePassword';
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<Auth />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
           <Route path="/" element={<AppLayout />}>
             <Route index element={<CivicFeed />} />
             <Route path="complaint/:id" element={<ComplaintDetails />} />
