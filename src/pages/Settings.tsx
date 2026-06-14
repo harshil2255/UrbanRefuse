@@ -6,12 +6,16 @@ import { User, Moon, Sun, LogOut, Save } from 'lucide-react';
 export default function Settings() {
   const { user, profile } = useAuth();
   const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
   const [isDark, setIsDark] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (profile) setFullName(profile.full_name || '');
+    if (profile) {
+      setFullName(profile.full_name || '');
+      setPhone(profile.phone || '');
+    }
     setIsDark(document.documentElement.classList.contains('dark'));
   }, [profile]);
 
@@ -36,7 +40,7 @@ export default function Settings() {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: fullName })
+        .update({ full_name: fullName, phone: phone })
         .eq('id', user?.id);
 
       if (error) throw error;
@@ -81,6 +85,16 @@ export default function Settings() {
                   type="text" 
                   value={fullName} 
                   onChange={(e) => setFullName(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
+                <input 
+                  type="tel" 
+                  value={phone} 
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="e.g. +1 234 567 8900"
                   className="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white"
                 />
               </div>
