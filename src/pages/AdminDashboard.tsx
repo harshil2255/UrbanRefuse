@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Shield, MapPin, Trash2, Users, ArrowUpDown } from 'lucide-react';
+import { Shield, MapPin, Trash2, Users, ArrowUpDown, Download } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [complaints, setComplaints] = useState<any[]>([]);
@@ -80,6 +80,42 @@ export default function AdminDashboard() {
       }
     });
 
+  const downloadCSV = () => {
+    let csvString = "";
+    
+    if (activeTab === 'overview') {
+      csvString += "ID,Status,Date Reported,Category,Reported By,Email,Collector\n";
+      displayedComplaints.forEach(c => {
+        const row = [
+          c.id, c.status, new Date(c.created_at).toLocaleString(), c.category, 
+          c.profiles?.full_name || 'Citizen', c.profiles?.email || 'N/A', c.collector?.full_name || 'Unassigned'
+        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(",");
+        csvString += row + "\n";
+      });
+    } else if (activeTab === 'users') {
+      csvString += "ID,Name,Email,Joined Date,Role\n";
+      profiles.forEach(p => {
+        const row = [
+          p.id, p.full_name || 'Unknown User', p.email || 'N/A', 
+          new Date(p.created_at).toLocaleString(), p.role
+        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(",");
+        csvString += row + "\n";
+      });
+    } else {
+      return;
+    }
+
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `urbanrefuse_${activeTab}_export.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-8 animate-fade-in font-['Outfit'] transition-colors">
       <div className="flex items-center space-x-3 mb-2">
@@ -88,25 +124,37 @@ export default function AdminDashboard() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex space-x-2 border-b border-gray-200 dark:border-slate-700">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'overview' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-        >
-          Issues Overview
-        </button>
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'users' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-        >
-          User Management
-        </button>
-        <button
-          onClick={() => setActiveTab('dustbins')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'dustbins' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-        >
-          Manage Dustbins
-        </button>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-200 dark:border-slate-700">
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'overview' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          >
+            Issues Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'users' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          >
+            User Management
+          </button>
+          <button
+            onClick={() => setActiveTab('dustbins')}
+            className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'dustbins' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          >
+            Manage Dustbins
+          </button>
+        </div>
+        
+        {(activeTab === 'overview' || activeTab === 'users') && (
+          <button 
+            onClick={downloadCSV}
+            className="flex items-center mt-2 sm:mt-0 mb-2 sm:mb-0 px-4 py-2 text-sm font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-xl transition-colors dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 shadow-sm"
+          >
+            <Download size={16} className="mr-2" />
+            Export Data
+          </button>
+        )}
       </div>
 
       {/* Tab: Overview */}
@@ -119,8 +167,8 @@ export default function AdminDashboard() {
               {/* Filter */}
               <div className="flex bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-1 shadow-sm">
                 <button onClick={() => setFilter('all')} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${filter === 'all' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}>All</button>
-                <button onClick={() => setFilter('unresolved')} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${filter === 'unresolved' ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}>Unresolved</button>
                 <button onClick={() => setFilter('resolved')} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${filter === 'resolved' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}>Resolved</button>
+                <button onClick={() => setFilter('unresolved')} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${filter === 'unresolved' ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}>Unresolved</button>
               </div>
               
               {/* Sort */}
