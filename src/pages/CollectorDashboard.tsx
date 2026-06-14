@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { ClipboardList, Save, CheckCircle, Hand, MapPin, Camera, X, Clock } from 'lucide-react';
+import { ClipboardList, Save, CheckCircle, Hand, MapPin, Camera, X, Clock, ArrowUpDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
@@ -21,6 +21,8 @@ export default function CollectorDashboard() {
   const [availableTasks, setAvailableTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'my_tasks' | 'available'>('my_tasks');
+  const [sortMyTasks, setSortMyTasks] = useState<'newest' | 'oldest' | 'upvotes'>('newest');
+  const [sortAvailable, setSortAvailable] = useState<'upvotes' | 'newest' | 'oldest'>('upvotes');
 
   useEffect(() => {
     if (user) {
@@ -33,12 +35,16 @@ export default function CollectorDashboard() {
     try {
       const { data, error } = await supabase
         .from('complaints')
-        .select('*, profiles!complaints_creator_id_fkey(full_name, phone)')
+        .select('*, profiles!complaints_creator_id_fkey(full_name, phone), complaint_upvotes(user_id)')
         .eq('assigned_collector_id', user?.id)
         .order('created_at', { ascending: false });
         
       if (error) throw error;
-      setTasks(data || []);
+      const formattedData = (data || []).map((item: any) => ({
+        ...item,
+        upvotes_count: item.complaint_upvotes?.length || 0,
+      }));
+      setTasks(formattedData);
     } catch (error) {
       console.error('Error fetching my tasks:', error);
     }
@@ -58,7 +64,7 @@ export default function CollectorDashboard() {
       const formattedData = (data || []).map((item: any) => ({
         ...item,
         upvotes_count: item.complaint_upvotes?.length || 0,
-      })).sort((a, b) => b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }));
 
       setAvailableTasks(formattedData);
     } catch (error) {
@@ -93,6 +99,26 @@ export default function CollectorDashboard() {
     );
   }
 
+  const displayedMyTasks = [...tasks].sort((a, b) => {
+    if (sortMyTasks === 'upvotes') {
+      return b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else if (sortMyTasks === 'newest') {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    }
+  });
+
+  const displayedAvailableTasks = [...availableTasks].sort((a, b) => {
+    if (sortAvailable === 'upvotes') {
+      return b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else if (sortAvailable === 'newest') {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    }
+  });
+
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-8 animate-fade-in font-['Outfit']">
       <div className="flex items-center justify-between mb-2">
@@ -105,28 +131,43 @@ export default function CollectorDashboard() {
         </div>
       </div>
 
-      <div className="flex space-x-2 border-b border-gray-200 dark:border-slate-700">
-        <button
-          onClick={() => setActiveTab('my_tasks')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'my_tasks' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-        >
-          My Assigned Tasks ({tasks.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('available')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'available' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
-        >
-          Available Task Pool ({availableTasks.length})
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 dark:border-slate-700 mb-6 gap-4">
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setActiveTab('my_tasks')}
+            className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'my_tasks' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          >
+            My Assigned Tasks ({tasks.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('available')}
+            className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'available' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          >
+            Available Task Pool ({availableTasks.length})
+          </button>
+        </div>
+        
+        <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm mb-2 sm:mb-0">
+          <ArrowUpDown size={16} className="text-gray-400 mr-2" />
+          <select
+            value={activeTab === 'my_tasks' ? sortMyTasks : sortAvailable}
+            onChange={(e) => activeTab === 'my_tasks' ? setSortMyTasks(e.target.value as any) : setSortAvailable(e.target.value as any)}
+            className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer appearance-none pr-4"
+          >
+            <option value="upvotes" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Most Rated</option>
+            <option value="newest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Newest First</option>
+            <option value="oldest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Oldest First</option>
+          </select>
+        </div>
       </div>
 
       <div className="space-y-6">
         {activeTab === 'my_tasks' && (
           <>
-            {tasks.map((task) => (
+            {displayedMyTasks.map((task) => (
               <TaskCard key={task.id} task={task} onUpdateComplete={fetchMyTasks} />
             ))}
-            {tasks.length === 0 && (
+            {displayedMyTasks.length === 0 && (
               <EmptyState message="You have no assigned tasks. Check the Available Pool!" />
             )}
           </>
@@ -134,10 +175,10 @@ export default function CollectorDashboard() {
 
         {activeTab === 'available' && (
           <div className="grid grid-cols-1 gap-6">
-            {availableTasks.map((task) => (
+            {displayedAvailableTasks.map((task) => (
               <AvailableTaskCard key={task.id} task={task} onClaim={() => handleClaim(task.id)} />
             ))}
-            {availableTasks.length === 0 && (
+            {displayedAvailableTasks.length === 0 && (
               <div className="md:col-span-2">
                 <EmptyState message="No pending issues available to claim right now." />
               </div>
@@ -291,9 +332,13 @@ function TaskCard({ task, onUpdateComplete }: { task: any, onUpdateComplete: () 
             <Link to={`/complaint/${task.id}`} className="font-bold text-lg text-gray-900 dark:text-white hover:text-emerald-600 transition-colors">
               {task.category}
             </Link>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex flex-col space-y-1">
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-2 flex flex-col space-y-1.5">
               <div className="flex items-center">
-                <Clock size={14} className="mr-1" />
+                <strong className="text-gray-700 dark:text-gray-300 mr-1.5">Reported by:</strong> 
+                {task.profiles?.full_name || 'Citizen'}
+              </div>
+              <div className="flex items-center">
+                <Clock size={14} className="mr-1.5" />
                 {new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </div>
               <div className="flex items-center">
