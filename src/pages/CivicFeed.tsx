@@ -152,7 +152,7 @@ export default function CivicFeed() {
             <Link 
               key={complaint.id} 
               to={`/complaint/${complaint.id}`}
-              className="block bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-shadow group"
+              className="block bg-white/80 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-white/5 hover:border-emerald-500/30 transition-all group"
             >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center space-x-3">
@@ -168,11 +168,16 @@ export default function CivicFeed() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold mb-2 ${
-                    complaint.status === 'Resolved' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                    complaint.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                  <span className={`px-3 py-1.5 rounded-full text-xs font-semibold mb-2 flex items-center border ${
+                    complaint.status === 'Resolved' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' :
+                    complaint.status === 'In Progress' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' :
+                    'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
                   }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                      complaint.status === 'Resolved' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' :
+                      complaint.status === 'In Progress' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]' :
+                      'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'
+                    }`}></span>
                     {complaint.status}
                   </span>
                 </div>
@@ -183,16 +188,16 @@ export default function CivicFeed() {
               </p>
 
               {complaint.image_url && (
-                <div className="mt-4 rounded-xl overflow-hidden border border-gray-100 dark:border-slate-700 h-48 bg-gray-50 dark:bg-slate-900 relative">
+                <div className="mt-4 rounded-[12px] overflow-hidden border border-gray-200/50 dark:border-white/10 aspect-video bg-gray-50 dark:bg-slate-900 relative">
                   <img src={complaint.image_url} alt="Issue evidence" className="w-full h-full object-cover" />
                 </div>
               )}
 
-              <div className="mt-4 pt-4 border-t border-gray-50 dark:border-slate-700 flex items-center space-x-6 text-gray-500 dark:text-gray-400 text-sm font-medium">
-                <div className="flex items-center text-emerald-600 dark:text-emerald-500">
+              <div className="mt-5 pt-4 border-t border-gray-100 dark:border-white/5 flex items-center space-x-3 text-sm font-medium">
+                <div className="flex items-center text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-full">
                   <ThumbsUp size={16} className="mr-1.5" /> {complaint.upvotes_count} Upvotes
                 </div>
-                <div className="flex items-center hover:text-emerald-600 transition-colors">
+                <div className="flex items-center text-gray-500 dark:text-gray-400 hover:text-emerald-600 hover:bg-gray-50 dark:hover:bg-white/5 px-3 py-1.5 rounded-full transition-colors">
                   <MessageSquare size={16} className="mr-1.5" /> {complaint.comments_count} Comments
                 </div>
               </div>
@@ -204,7 +209,7 @@ export default function CivicFeed() {
       {/* Floating Action Button */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-8 right-8 bg-emerald-600 text-white p-4 rounded-full shadow-lg hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-1 transition-all z-40 group"
+        className="fixed bottom-8 right-8 bg-emerald-500 text-white p-4 rounded-full shadow-[0_8px_24px_rgba(16,185,129,0.4)] hover:shadow-[0_12px_32px_rgba(16,185,129,0.6)] hover:-translate-y-1 transition-all z-40 group"
       >
         <Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" />
       </button>

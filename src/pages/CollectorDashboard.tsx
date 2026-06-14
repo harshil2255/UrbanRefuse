@@ -188,10 +188,10 @@ export default function CollectorDashboard() {
           {activeTab === 'my_tasks' && (
             <motion.div 
               key="my_tasks"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
             >
               <div key={sortMyTasks}>
             {displayedMyTasks.map((task) => (
@@ -209,10 +209,10 @@ export default function CollectorDashboard() {
         {activeTab === 'available' && (
           <motion.div 
             key="available"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 10 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             className="grid grid-cols-1 gap-6"
           >
             {displayedAvailableTasks.map((task) => (

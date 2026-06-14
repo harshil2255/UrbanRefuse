@@ -31,10 +31,10 @@ export default function AppLayout() {
   }
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+    `flex items-center space-x-2 px-3 py-5 text-sm font-medium transition-all border-b-2 ${
       isActive 
-        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300' 
-        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-gray-100'
+        ? 'border-emerald-500 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400 drop-shadow-[0_2px_4px_rgba(16,185,129,0.3)]' 
+        : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-200 dark:hover:border-slate-700'
     }`;
 
   return (
@@ -135,10 +135,10 @@ export default function AppLayout() {
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             className="w-full h-full"
           >
             <Outlet />
