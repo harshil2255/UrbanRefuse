@@ -36,9 +36,9 @@ export default function AppLayout() {
     }`;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col font-['Outfit'] transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-slate-50 to-teal-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/30 flex flex-col font-['Outfit'] transition-colors">
       {/* Top Header */}
-      <header className="bg-white dark:bg-slate-900 shadow-sm sticky top-0 z-40 border-b border-gray-100 dark:border-slate-800 transition-colors">
+      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm sticky top-0 z-40 border-b border-gray-100 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-8">
             <div className="flex items-center space-x-2 text-emerald-600 dark:text-emerald-500">
@@ -100,7 +100,7 @@ export default function AppLayout() {
         </div>
         
         {/* Mobile Navigation */}
-        <div className="md:hidden border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2 flex overflow-x-auto space-x-2 transition-colors">
+        <div className="md:hidden border-t border-gray-100 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg px-4 py-2 flex overflow-x-auto space-x-2 transition-colors">
             <NavLink to="/" className={navClass} end>
               <LayoutList size={18} />
               <span>Feed</span>
