@@ -133,7 +133,7 @@ export default function CollectorDashboard() {
         )}
 
         {activeTab === 'available' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {availableTasks.map((task) => (
               <AvailableTaskCard key={task.id} task={task} onClaim={() => handleClaim(task.id)} />
             ))}
@@ -160,17 +160,54 @@ function AvailableTaskCard({ task, onClaim }: { task: any, onClaim: () => void }
           ⭐ {task.upvotes_count} Upvotes
         </span>
       </div>
-      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">{task.description}</p>
       
-      {task.image_url && (
-        <div className="h-32 w-full mb-4 rounded-lg overflow-hidden border border-gray-100 dark:border-slate-700">
-          <img src={task.image_url} alt="Issue" className="w-full h-full object-cover" />
+      <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 space-y-1.5">
+        <div className="flex items-center">
+          <strong className="text-gray-700 dark:text-gray-300 mr-1.5">Reported by:</strong> 
+          {task.profiles?.full_name || 'Citizen'}
         </div>
-      )}
+        <div className="flex items-center">
+          <Clock size={14} className="mr-1.5" />
+          {new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        </div>
+        <div className="flex items-center">
+          <MapPin size={14} className="mr-1.5" />
+          {task.location_lat.toFixed(4)}, {task.location_lng.toFixed(4)}
+        </div>
+        {task.profiles?.phone && (
+          <div className="text-emerald-600 dark:text-emerald-400 font-medium inline-flex items-center bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-lg mt-1">
+            📞 {task.profiles.phone}
+          </div>
+        )}
+      </div>
 
-      <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-4 bg-gray-50 dark:bg-slate-900/50 p-2 rounded-lg">
-        <MapPin size={14} className="mr-1 text-emerald-500 shrink-0" />
-        <span className="truncate">{task.location_lat.toFixed(4)}, {task.location_lng.toFixed(4)}</span>
+      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{task.description}</p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {task.image_url ? (
+          <div className="h-48 w-full rounded-lg overflow-hidden border border-gray-100 dark:border-slate-700">
+            <img src={task.image_url} alt="Issue" className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div className="h-48 w-full rounded-lg border border-dashed border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 flex items-center justify-center text-gray-400 text-sm">
+            No photo provided
+          </div>
+        )}
+
+        <div className="h-48 w-full rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 relative z-0">
+          <MapContainer 
+            center={[task.location_lat, task.location_lng]} 
+            zoom={15} 
+            className="h-full w-full"
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={[task.location_lat, task.location_lng]} />
+          </MapContainer>
+        </div>
       </div>
 
       <div className="mt-auto">
