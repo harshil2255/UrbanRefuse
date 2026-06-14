@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { ClipboardList, Save, CheckCircle, Hand, MapPin, Camera, X, Clock, ArrowUpDown } from 'lucide-react';
@@ -14,6 +14,22 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
+
+class ErrorBoundary extends React.Component<any, any> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div className="p-10 text-red-500"><h1 className="font-bold text-xl">Crash!</h1><pre className="whitespace-pre-wrap">{this.state.error?.toString()}</pre><pre className="whitespace-pre-wrap text-xs">{this.state.error?.stack}</pre></div>;
+    }
+    return this.props.children;
+  }
+}
 
 export default function CollectorDashboard() {
   const { user } = useAuth();
@@ -100,26 +116,31 @@ export default function CollectorDashboard() {
   }
 
   const displayedMyTasks = [...tasks].sort((a, b) => {
+    const timeA = new Date(a.created_at || Date.now()).getTime();
+    const timeB = new Date(b.created_at || Date.now()).getTime();
     if (sortMyTasks === 'upvotes') {
-      return b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return (b.upvotes_count || 0) - (a.upvotes_count || 0) || timeB - timeA;
     } else if (sortMyTasks === 'newest') {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return timeB - timeA;
     } else {
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      return timeA - timeB;
     }
   });
 
   const displayedAvailableTasks = [...availableTasks].sort((a, b) => {
+    const timeA = new Date(a.created_at || Date.now()).getTime();
+    const timeB = new Date(b.created_at || Date.now()).getTime();
     if (sortAvailable === 'upvotes') {
-      return b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return (b.upvotes_count || 0) - (a.upvotes_count || 0) || timeB - timeA;
     } else if (sortAvailable === 'newest') {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return timeB - timeA;
     } else {
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      return timeA - timeB;
     }
   });
 
   return (
+    <ErrorBoundary>
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-8 animate-fade-in font-['Outfit']">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-3">
@@ -163,18 +184,20 @@ export default function CollectorDashboard() {
 
       <div className="space-y-6">
         {activeTab === 'my_tasks' && (
-          <>
+          <div key={sortMyTasks}>
             {displayedMyTasks.map((task) => (
-              <TaskCard key={task.id} task={task} onUpdateComplete={fetchMyTasks} />
+              <div key={task.id} className="mb-6">
+                <TaskCard task={task} onUpdateComplete={fetchMyTasks} />
+              </div>
             ))}
             {displayedMyTasks.length === 0 && (
               <EmptyState message="You have no assigned tasks. Check the Available Pool!" />
             )}
-          </>
+          </div>
         )}
 
         {activeTab === 'available' && (
-          <div className="grid grid-cols-1 gap-6">
+          <div key={sortAvailable} className="grid grid-cols-1 gap-6">
             {displayedAvailableTasks.map((task) => (
               <AvailableTaskCard key={task.id} task={task} onClaim={() => handleClaim(task.id)} />
             ))}
@@ -187,6 +210,7 @@ export default function CollectorDashboard() {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }
 
@@ -209,11 +233,11 @@ function AvailableTaskCard({ task, onClaim }: { task: any, onClaim: () => void }
         </div>
         <div className="flex items-center">
           <Clock size={14} className="mr-1.5" />
-          {new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          {task.created_at ? new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown date'}
         </div>
         <div className="flex items-center">
           <MapPin size={14} className="mr-1.5" />
-          {task.location_lat.toFixed(4)}, {task.location_lng.toFixed(4)}
+          {task.location_lat?.toFixed(4) || 0}, {task.location_lng?.toFixed(4) || 0}
         </div>
         {task.profiles?.phone && (
           <div className="text-emerald-600 dark:text-emerald-400 font-medium inline-flex items-center bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-lg mt-1">
@@ -339,11 +363,11 @@ function TaskCard({ task, onUpdateComplete }: { task: any, onUpdateComplete: () 
               </div>
               <div className="flex items-center">
                 <Clock size={14} className="mr-1.5" />
-                {new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                {task.created_at ? new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown date'}
               </div>
               <div className="flex items-center">
                 <MapPin size={14} className="mr-1" />
-                {task.location_lat.toFixed(4)}, {task.location_lng.toFixed(4)}
+                {task.location_lat?.toFixed(4) || 0}, {task.location_lng?.toFixed(4) || 0}
               </div>
             </div>
             {task.profiles?.phone && (
