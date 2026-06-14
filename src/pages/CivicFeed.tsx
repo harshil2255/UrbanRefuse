@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Clock, MessageSquare, ThumbsUp } from 'lucide-react';
+import { Plus, Clock, MessageSquare, ThumbsUp, ArrowUpDown } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import ReportIssueModal from '../components/ReportIssueModal';
 import { Link } from 'react-router-dom';
 
@@ -11,6 +12,7 @@ interface Complaint {
   status: string;
   created_at: string;
   image_url: string | null;
+  creator_id: string;
   profiles: { full_name: string };
   upvotes_count: number;
   comments_count: number;
@@ -20,6 +22,9 @@ export default function CivicFeed() {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<'all' | 'mine'>('all');
+  const [sortBy, setSortBy] = useState<'upvotes' | 'newest' | 'oldest'>('upvotes');
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchComplaints();
@@ -36,6 +41,7 @@ export default function CivicFeed() {
           status,
           created_at,
           image_url,
+          creator_id,
           profiles!complaints_creator_id_fkey (full_name),
           complaint_upvotes(user_id),
           comments(id)
@@ -44,12 +50,12 @@ export default function CivicFeed() {
 
       if (error) throw error;
       
-      // Calculate counts and sort by upvotes
+      // Calculate counts, but don't sort here, we'll sort dynamically
       const formattedData = (data || []).map((item: any) => ({
         ...item,
         upvotes_count: item.complaint_upvotes?.length || 0,
         comments_count: item.comments?.length || 0,
-      })).sort((a, b) => b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }));
 
       setComplaints(formattedData);
     } catch (error) {
@@ -65,12 +71,54 @@ export default function CivicFeed() {
     });
   };
 
+  // Apply filters and sorting dynamically
+  const displayedComplaints = complaints
+    .filter(c => filter === 'all' || (filter === 'mine' && c.creator_id === user?.id))
+    .sort((a, b) => {
+      if (sortBy === 'upvotes') {
+        return b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      } else if (sortBy === 'newest') {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      } else { // oldest
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      }
+    });
+
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto relative min-h-[calc(100vh-4rem)]">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 space-y-4 md:space-y-0">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Live Feed</h1>
-        <div className="bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 rounded-full px-4 py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-          Top Priorities First
+        
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+          {/* View Filter */}
+          <div className="flex bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-1 shadow-sm">
+            <button
+              onClick={() => setFilter('all')}
+              className={`flex-1 sm:flex-none px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${filter === 'all' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+            >
+              All Reports
+            </button>
+            <button
+              onClick={() => setFilter('mine')}
+              className={`flex-1 sm:flex-none px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${filter === 'mine' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+            >
+              My Reports
+            </button>
+          </div>
+
+          {/* Sort Dropdown */}
+          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm">
+            <ArrowUpDown size={16} className="text-gray-400 mr-2" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer appearance-none pr-4"
+            >
+              <option value="upvotes">Most Liked</option>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -80,7 +128,7 @@ export default function CivicFeed() {
             <div key={i} className="animate-pulse bg-white dark:bg-slate-800 h-32 rounded-2xl border border-gray-100 dark:border-slate-700"></div>
           ))}
         </div>
-      ) : complaints.length === 0 ? (
+      ) : displayedComplaints.length === 0 ? (
         <div className="text-center py-20">
           <div className="bg-emerald-50 dark:bg-emerald-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <MessageSquare size={24} className="text-emerald-600 dark:text-emerald-400" />
@@ -90,7 +138,7 @@ export default function CivicFeed() {
         </div>
       ) : (
         <div className="space-y-6">
-          {complaints.map((complaint) => (
+          {displayedComplaints.map((complaint) => (
             <Link 
               key={complaint.id} 
               to={`/complaint/${complaint.id}`}
