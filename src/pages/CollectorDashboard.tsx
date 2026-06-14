@@ -1,8 +1,19 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { ClipboardList, Save, CheckCircle, Hand, MapPin, Camera, X } from 'lucide-react';
+import { ClipboardList, Save, CheckCircle, Hand, MapPin, Camera, X, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix for default marker icon in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 export default function CollectorDashboard() {
   const { user } = useAuth();
@@ -243,9 +254,15 @@ function TaskCard({ task, onUpdateComplete }: { task: any, onUpdateComplete: () 
             <Link to={`/complaint/${task.id}`} className="font-bold text-lg text-gray-900 dark:text-white hover:text-emerald-600 transition-colors">
               {task.category}
             </Link>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-              <MapPin size={14} className="mr-1" />
-              {task.location_lat.toFixed(4)}, {task.location_lng.toFixed(4)}
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex flex-col space-y-1">
+              <div className="flex items-center">
+                <Clock size={14} className="mr-1" />
+                {new Date(task.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </div>
+              <div className="flex items-center">
+                <MapPin size={14} className="mr-1" />
+                {task.location_lat.toFixed(4)}, {task.location_lng.toFixed(4)}
+              </div>
             </div>
             {task.profiles?.phone && (
               <div className="text-sm text-emerald-600 dark:text-emerald-400 mt-2 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-lg inline-flex items-center">
@@ -262,6 +279,22 @@ function TaskCard({ task, onUpdateComplete }: { task: any, onUpdateComplete: () 
               No photo provided
             </div>
           )}
+
+          {/* Small Interactive Map */}
+          <div className="h-40 w-full rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 relative z-0 mb-4">
+            <MapContainer 
+              center={[task.location_lat, task.location_lng]} 
+              zoom={15} 
+              className="h-full w-full"
+              scrollWheelZoom={false}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker position={[task.location_lat, task.location_lng]} />
+            </MapContainer>
+          </div>
         </div>
 
         {/* Right Form */}
