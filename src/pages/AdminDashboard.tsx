@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Shield, MapPin, Trash2, Users, ArrowUpDown, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 export default function AdminDashboard() {
   const [complaints, setComplaints] = useState<any[]>([]);
@@ -80,40 +81,38 @@ export default function AdminDashboard() {
       }
     });
 
-  const downloadCSV = () => {
-    let csvString = "";
+  const downloadExcel = () => {
+    let data: any[] = [];
     
     if (activeTab === 'overview') {
-      csvString += "ID,Status,Date Reported,Category,Reported By,Email,Collector\n";
-      displayedComplaints.forEach(c => {
-        const row = [
-          c.id, c.status, new Date(c.created_at).toLocaleString(), c.category, 
-          c.profiles?.full_name || 'Citizen', c.profiles?.email || 'N/A', c.collector?.full_name || 'Unassigned'
-        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(",");
-        csvString += row + "\n";
-      });
+      data = displayedComplaints.map(c => ({
+        'ID': c.id,
+        'Status': c.status,
+        'Date Reported': new Date(c.created_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }),
+        'Category': c.category,
+        'Description': c.description || 'N/A',
+        'Location (Lat, Lng)': `${c.location_lat}, ${c.location_lng}`,
+        'Reported By': c.profiles?.full_name || 'Citizen',
+        'Email': c.profiles?.email || 'N/A',
+        'Assigned Collector': c.collector?.full_name || 'Unassigned'
+      }));
     } else if (activeTab === 'users') {
-      csvString += "ID,Name,Email,Joined Date,Role\n";
-      profiles.forEach(p => {
-        const row = [
-          p.id, p.full_name || 'Unknown User', p.email || 'N/A', 
-          new Date(p.created_at).toLocaleString(), p.role
-        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(",");
-        csvString += row + "\n";
-      });
+      data = profiles.map(p => ({
+        'ID': p.id,
+        'Name': p.full_name || 'Unknown User',
+        'Email': p.email || 'N/A',
+        'Joined Date': new Date(p.created_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }),
+        'Role': p.role
+      }));
     } else {
       return;
     }
 
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `urbanrefuse_${activeTab}_export.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, activeTab === 'overview' ? 'Issues Data' : 'Users Data');
+    
+    XLSX.writeFile(workbook, `UrbanRefuse_${activeTab}_export.xlsx`);
   };
 
   return (
@@ -148,11 +147,11 @@ export default function AdminDashboard() {
         
         {(activeTab === 'overview' || activeTab === 'users') && (
           <button 
-            onClick={downloadCSV}
+            onClick={downloadExcel}
             className="flex items-center mt-2 sm:mt-0 mb-2 sm:mb-0 px-4 py-2 text-sm font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-xl transition-colors dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 shadow-sm"
           >
             <Download size={16} className="mr-2" />
-            Export Data
+            Export to Excel
           </button>
         )}
       </div>
