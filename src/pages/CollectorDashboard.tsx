@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { ClipboardList, Save, CheckCircle, Hand, MapPin, Camera, X, Clock, ArrowUpDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -184,16 +183,8 @@ export default function CollectorDashboard() {
       </div>
 
       <div className="space-y-6">
-        <AnimatePresence mode="wait">
-          {activeTab === 'my_tasks' && (
-            <motion.div 
-              key="my_tasks"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              <div key={sortMyTasks}>
+        {activeTab === 'my_tasks' && (
+          <div key={sortMyTasks}>
             {displayedMyTasks.map((task) => (
               <div key={task.id} className="mb-6">
                 <TaskCard task={task} onUpdateComplete={fetchMyTasks} />
@@ -203,29 +194,20 @@ export default function CollectorDashboard() {
               <EmptyState message="You have no assigned tasks. Check the Available Pool!" />
               )}
             </div>
-          </motion.div>
         )}
 
         {activeTab === 'available' && (
-          <motion.div 
-            key="available"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="grid grid-cols-1 gap-6"
-          >
+          <div key={sortAvailable} className="grid grid-cols-1 gap-6">
             {displayedAvailableTasks.map((task) => (
               <AvailableTaskCard key={task.id} task={task} onClaim={() => handleClaim(task.id)} />
             ))}
             {displayedAvailableTasks.length === 0 && (
-              <div className="md:col-span-2">
+              <div className="col-span-full">
                 <EmptyState message="No pending issues available to claim right now." />
               </div>
             )}
-          </motion.div>
+          </div>
         )}
-        </AnimatePresence>
       </div>
     </div>
     </ErrorBoundary>

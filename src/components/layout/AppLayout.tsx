@@ -1,12 +1,10 @@
 import { useEffect } from 'react';
-import { Outlet, Navigate, NavLink, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Outlet, Navigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Trash2, Map, LayoutList, Shield, ClipboardList, Settings as SettingsIcon, Trophy } from 'lucide-react';
 
 export default function AppLayout() {
   const { user, profile, loading } = useAuth();
-  const location = useLocation();
 
   useEffect(() => {
     // Initialize dark mode from local storage
@@ -38,7 +36,7 @@ export default function AppLayout() {
     }`;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] flex flex-col font-['Outfit'] transition-colors relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col font-['Outfit'] transition-colors relative overflow-x-hidden">
       {/* Ambient Background Glows */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-400/20 dark:bg-emerald-900/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
       <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-teal-400/20 dark:bg-teal-900/30 rounded-full blur-[100px] pointer-events-none z-0"></div>
@@ -136,18 +134,7 @@ export default function AppLayout() {
 
       {/* Main Content Area */}
       <main className="flex-1 w-full relative z-10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="w-full h-full"
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
+        <Outlet />
       </main>
     </div>
   );
