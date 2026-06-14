@@ -26,7 +26,7 @@ export default function Leaderboard() {
           id,
           full_name,
           role,
-          complaints (id)
+          complaints!complaints_creator_id_fkey (id)
         `);
 
       if (error) throw error;
