@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Shield, MapPin, Trash2, Users, ArrowUpDown, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminDashboard() {
   const [complaints, setComplaints] = useState<any[]>([]);
@@ -156,10 +157,19 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* Tab: Overview */}
-      {activeTab === 'overview' && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
+      {/* Tab Content */}
+      <AnimatePresence mode="wait">
+        {/* Tab: Overview */}
+        {activeTab === 'overview' && (
+          <motion.div 
+            key="overview"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors"
+          >
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">All Reports</h2>
             
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
@@ -235,13 +245,20 @@ export default function AdminDashboard() {
               <div className="p-8 text-center text-gray-500 dark:text-gray-400">No reports found.</div>
             )}
           </div>
-        </div>
-      )}
+        </motion.div>
+        )}
 
-      {/* Tab: Users */}
-      {activeTab === 'users' && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 flex justify-between items-center">
+        {/* Tab: Users */}
+        {activeTab === 'users' && (
+          <motion.div 
+            key="users"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors"
+          >
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 flex justify-between items-center">
             <h2 className="text-lg font-bold flex items-center text-gray-900 dark:text-white">
               <Users className="mr-2 text-emerald-500" size={20} />
               Platform Users
@@ -289,13 +306,20 @@ export default function AdminDashboard() {
               </tbody>
             </table>
           </div>
-        </div>
-      )}
+        </motion.div>
+        )}
 
-      {/* Tab: Dustbins */}
-      {activeTab === 'dustbins' && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 sm:p-8 max-w-lg transition-colors">
-          <div className="flex items-center mb-6 text-emerald-600 dark:text-emerald-500">
+        {/* Tab: Dustbins */}
+        {activeTab === 'dustbins' && (
+          <motion.div 
+            key="dustbins"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 sm:p-8 max-w-lg transition-colors"
+          >
+            <div className="flex items-center mb-6 text-emerald-600 dark:text-emerald-500">
             <Trash2 size={24} className="mr-2" />
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add New Public Dustbin</h2>
           </div>
@@ -339,8 +363,9 @@ export default function AdminDashboard() {
               </div>
             )}
           </form>
-        </div>
-      )}
+        </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

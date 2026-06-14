@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { ClipboardList, Save, CheckCircle, Hand, MapPin, Camera, X, Clock, ArrowUpDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -183,8 +184,16 @@ export default function CollectorDashboard() {
       </div>
 
       <div className="space-y-6">
-        {activeTab === 'my_tasks' && (
-          <div key={sortMyTasks}>
+        <AnimatePresence mode="wait">
+          {activeTab === 'my_tasks' && (
+            <motion.div 
+              key="my_tasks"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div key={sortMyTasks}>
             {displayedMyTasks.map((task) => (
               <div key={task.id} className="mb-6">
                 <TaskCard task={task} onUpdateComplete={fetchMyTasks} />
@@ -192,12 +201,20 @@ export default function CollectorDashboard() {
             ))}
             {displayedMyTasks.length === 0 && (
               <EmptyState message="You have no assigned tasks. Check the Available Pool!" />
-            )}
-          </div>
+              )}
+            </div>
+          </motion.div>
         )}
 
         {activeTab === 'available' && (
-          <div key={sortAvailable} className="grid grid-cols-1 gap-6">
+          <motion.div 
+            key="available"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.2 }}
+            className="grid grid-cols-1 gap-6"
+          >
             {displayedAvailableTasks.map((task) => (
               <AvailableTaskCard key={task.id} task={task} onClaim={() => handleClaim(task.id)} />
             ))}
@@ -206,8 +223,9 @@ export default function CollectorDashboard() {
                 <EmptyState message="No pending issues available to claim right now." />
               </div>
             )}
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
     </div>
     </ErrorBoundary>

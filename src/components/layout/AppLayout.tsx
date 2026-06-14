@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
-import { Outlet, Navigate, NavLink } from 'react-router-dom';
+import { Outlet, Navigate, NavLink, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { Trash2, Map, LayoutList, Shield, ClipboardList, Settings as SettingsIcon, Trophy } from 'lucide-react';
 
 export default function AppLayout() {
   const { user, profile, loading } = useAuth();
+  const location = useLocation();
 
   useEffect(() => {
     // Initialize dark mode from local storage
@@ -130,7 +132,18 @@ export default function AppLayout() {
 
       {/* Main Content Area */}
       <main className="flex-1 w-full relative z-0">
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="w-full h-full"
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );
