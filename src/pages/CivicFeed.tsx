@@ -22,7 +22,7 @@ export default function CivicFeed() {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'mine'>('all');
+  const [filter, setFilter] = useState<'all' | 'mine' | 'unresolved'>('all');
   const [sortBy, setSortBy] = useState<'upvotes' | 'newest' | 'oldest'>('upvotes');
   const { user } = useAuth();
 
@@ -73,7 +73,11 @@ export default function CivicFeed() {
 
   // Apply filters and sorting dynamically
   const displayedComplaints = complaints
-    .filter(c => filter === 'all' || (filter === 'mine' && c.creator_id === user?.id))
+    .filter(c => {
+      if (filter === 'mine') return c.creator_id === user?.id;
+      if (filter === 'unresolved') return c.status !== 'Resolved';
+      return true;
+    })
     .sort((a, b) => {
       if (sortBy === 'upvotes') {
         return b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -104,6 +108,12 @@ export default function CivicFeed() {
             >
               My Reports
             </button>
+            <button
+              onClick={() => setFilter('unresolved')}
+              className={`flex-1 sm:flex-none px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${filter === 'unresolved' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+            >
+              Unresolved
+            </button>
           </div>
 
           {/* Sort Dropdown */}
@@ -114,9 +124,9 @@ export default function CivicFeed() {
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer appearance-none pr-4"
             >
-              <option value="upvotes">Most Liked</option>
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
+              <option value="upvotes" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Most Liked</option>
+              <option value="newest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Newest First</option>
+              <option value="oldest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Oldest First</option>
             </select>
           </div>
         </div>
