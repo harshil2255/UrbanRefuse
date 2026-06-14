@@ -175,6 +175,11 @@ export default function ReportIssueModal({ isOpen, onClose, onSuccess }: { isOpe
               >
                 <option value="Litter">Litter / Sweeping Needed</option>
                 <option value="Overflowing Bin">Overflowing Public Bin</option>
+                <option value="E-Waste">E-Waste (Electronic Disposal Needed)</option>
+                <option value="Bio-Medical">Bio-Medical / Unsafe Items</option>
+                <option value="Construction Debris">Construction / Bulk Debris</option>
+                <option value="Dead Animal">Dead Animal Disposal</option>
+                <option value="Illegal Dumping">Illegal Dumping / Commercial Waste</option>
                 <option value="Hazardous">Hazardous Waste</option>
                 <option value="Other">Other</option>
               </select>
