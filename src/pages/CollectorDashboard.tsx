@@ -22,7 +22,7 @@ export default function CollectorDashboard() {
     try {
       const { data, error } = await supabase
         .from('complaints')
-        .select('*, profiles!complaints_creator_id_fkey(full_name)')
+        .select('*, profiles!complaints_creator_id_fkey(full_name, phone)')
         .eq('assigned_collector_id', user?.id)
         .order('created_at', { ascending: false });
         
@@ -37,7 +37,7 @@ export default function CollectorDashboard() {
     try {
       const { data, error } = await supabase
         .from('complaints')
-        .select('*, profiles!complaints_creator_id_fkey(full_name), complaint_upvotes(user_id)')
+        .select('*, profiles!complaints_creator_id_fkey(full_name, phone), complaint_upvotes(user_id)')
         .is('assigned_collector_id', null)
         .eq('status', 'Pending')
         .order('created_at', { ascending: false });
@@ -247,6 +247,11 @@ function TaskCard({ task, onUpdateComplete }: { task: any, onUpdateComplete: () 
               <MapPin size={14} className="mr-1" />
               {task.location_lat.toFixed(4)}, {task.location_lng.toFixed(4)}
             </div>
+            {task.profiles?.phone && (
+              <div className="text-sm text-emerald-600 dark:text-emerald-400 mt-2 font-medium bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-lg inline-flex items-center">
+                📞 {task.profiles.phone}
+              </div>
+            )}
           </div>
           {task.image_url ? (
              <div className="h-40 w-full rounded-xl overflow-hidden border border-gray-100 dark:border-slate-700 shadow-sm mb-4">

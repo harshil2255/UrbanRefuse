@@ -18,7 +18,7 @@ L.Icon.Default.mergeOptions({
 export default function ComplaintDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   
   const [complaint, setComplaint] = useState<any>(null);
   const [comments, setComments] = useState<any[]>([]);
@@ -38,7 +38,7 @@ export default function ComplaintDetails() {
       // Fetch complaint
       const { data: complaintData, error: cError } = await supabase
         .from('complaints')
-        .select('*, profiles!complaints_creator_id_fkey(full_name), collector:profiles!complaints_assigned_collector_id_fkey(full_name)')
+        .select('*, profiles!complaints_creator_id_fkey(full_name, phone), collector:profiles!complaints_assigned_collector_id_fkey(full_name)')
         .eq('id', id)
         .single();
       if (cError) throw cError;
@@ -155,8 +155,15 @@ export default function ComplaintDetails() {
             {complaint.description}
           </p>
 
-          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-6 bg-gray-50 dark:bg-slate-900/50 p-3 rounded-lg inline-flex">
-            Reported by <strong className="ml-1 text-gray-900 dark:text-gray-200">{complaint.profiles?.full_name || 'Citizen'}</strong>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-6">
+            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-900/50 p-3 rounded-lg inline-flex">
+              Reported by <strong className="ml-1 text-gray-900 dark:text-gray-200">{complaint.profiles?.full_name || 'Citizen'}</strong>
+            </div>
+            {(profile?.role === 'admin' || profile?.role === 'collector') && complaint.profiles?.phone && (
+              <div className="flex items-center mt-2 sm:mt-0 text-sm text-emerald-700 dark:text-emerald-400 font-medium bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-lg inline-flex">
+                📞 {complaint.profiles.phone}
+              </div>
+            )}
           </div>
 
           {/* Interactive Map */}
