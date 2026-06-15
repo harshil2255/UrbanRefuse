@@ -92,12 +92,9 @@ export default function CivicFeed() {
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto relative min-h-[calc(100vh-4rem)]">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 space-y-4 md:space-y-0">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Live Feed</h1>
-        
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-          {/* View Filter */}
-          <div className="flex bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-1 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 mb-8 w-full">
+        {/* View Filter */}
+        <div className="flex bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-1 shadow-sm flex-shrink-0">
             <button
               onClick={() => setFilter('all')}
               className={`flex-1 sm:flex-none px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${filter === 'all' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
@@ -119,7 +116,7 @@ export default function CivicFeed() {
           </div>
 
           {/* Category Filter */}
-          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm">
+          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm flex-shrink-0">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -139,7 +136,7 @@ export default function CivicFeed() {
           </div>
 
           {/* Sort Dropdown */}
-          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm">
+          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm flex-shrink-0">
             <ArrowUpDown size={16} className="text-gray-400 mr-2" />
             <select
               value={sortBy}
@@ -151,7 +148,6 @@ export default function CivicFeed() {
               <option value="oldest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Oldest First</option>
             </select>
           </div>
-        </div>
       </div>
 
       {loading ? (
