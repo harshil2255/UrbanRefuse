@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   
   // Overview Filters
   const [filter, setFilter] = useState<'all' | 'resolved' | 'unresolved'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   
   // New Dustbin Form
@@ -73,6 +74,7 @@ export default function AdminDashboard() {
       if (filter === 'unresolved') return c.status !== 'Resolved';
       return true;
     })
+    .filter(c => selectedCategory === 'all' || c.category === selectedCategory)
     .sort((a, b) => {
       if (sortBy === 'newest') {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -171,6 +173,26 @@ export default function AdminDashboard() {
                 <button onClick={() => setFilter('unresolved')} className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${filter === 'unresolved' ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}>Unresolved</button>
               </div>
               
+              {/* Category Filter */}
+              <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="bg-transparent text-xs font-medium text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer appearance-none pr-4"
+                >
+                  <option value="all" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">All Categories</option>
+                  <option value="Litter" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Litter</option>
+                  <option value="Overflowing Bin" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Overflowing Bin</option>
+                  <option value="E-Waste" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">E-Waste</option>
+                  <option value="Bio-Medical" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Bio-Medical</option>
+                  <option value="Construction Debris" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Construction Debris</option>
+                  <option value="Dead Animal" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Dead Animal</option>
+                  <option value="Illegal Dumping" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Illegal Dumping</option>
+                  <option value="Hazardous" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Hazardous</option>
+                  <option value="Other" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Other</option>
+                </select>
+              </div>
+
               {/* Sort */}
               <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm">
                 <ArrowUpDown size={14} className="text-gray-400 mr-2" />

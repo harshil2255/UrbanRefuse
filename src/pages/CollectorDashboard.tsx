@@ -39,6 +39,7 @@ export default function CollectorDashboard() {
   const [activeTab, setActiveTab] = useState<'my_tasks' | 'available'>('my_tasks');
   const [sortMyTasks, setSortMyTasks] = useState<'newest' | 'oldest' | 'upvotes'>('newest');
   const [sortAvailable, setSortAvailable] = useState<'upvotes' | 'newest' | 'oldest'>('upvotes');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   useEffect(() => {
     if (user) {
@@ -115,7 +116,9 @@ export default function CollectorDashboard() {
     );
   }
 
-  const displayedMyTasks = [...tasks].sort((a, b) => {
+  const displayedMyTasks = [...tasks]
+    .filter(t => selectedCategory === 'all' || t.category === selectedCategory)
+    .sort((a, b) => {
     const timeA = new Date(a.created_at || Date.now()).getTime();
     const timeB = new Date(b.created_at || Date.now()).getTime();
     if (sortMyTasks === 'upvotes') {
@@ -127,7 +130,9 @@ export default function CollectorDashboard() {
     }
   });
 
-  const displayedAvailableTasks = [...availableTasks].sort((a, b) => {
+  const displayedAvailableTasks = [...availableTasks]
+    .filter(t => selectedCategory === 'all' || t.category === selectedCategory)
+    .sort((a, b) => {
     const timeA = new Date(a.created_at || Date.now()).getTime();
     const timeB = new Date(b.created_at || Date.now()).getTime();
     if (sortAvailable === 'upvotes') {
@@ -168,17 +173,38 @@ export default function CollectorDashboard() {
           </button>
         </div>
         
-        <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm mb-2 sm:mb-0">
-          <ArrowUpDown size={16} className="text-gray-400 mr-2" />
-          <select
-            value={activeTab === 'my_tasks' ? sortMyTasks : sortAvailable}
-            onChange={(e) => activeTab === 'my_tasks' ? setSortMyTasks(e.target.value as any) : setSortAvailable(e.target.value as any)}
-            className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer appearance-none pr-4"
-          >
-            <option value="upvotes" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Most Rated</option>
-            <option value="newest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Newest First</option>
-            <option value="oldest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Oldest First</option>
-          </select>
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 mb-2 sm:mb-0">
+          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer appearance-none pr-4"
+            >
+              <option value="all" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">All Categories</option>
+              <option value="Litter" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Litter</option>
+              <option value="Overflowing Bin" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Overflowing Bin</option>
+              <option value="E-Waste" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">E-Waste</option>
+              <option value="Bio-Medical" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Bio-Medical</option>
+              <option value="Construction Debris" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Construction Debris</option>
+              <option value="Dead Animal" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Dead Animal</option>
+              <option value="Illegal Dumping" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Illegal Dumping</option>
+              <option value="Hazardous" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Hazardous</option>
+              <option value="Other" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Other</option>
+            </select>
+          </div>
+
+          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 shadow-sm">
+            <ArrowUpDown size={16} className="text-gray-400 mr-2" />
+            <select
+              value={activeTab === 'my_tasks' ? sortMyTasks : sortAvailable}
+              onChange={(e) => activeTab === 'my_tasks' ? setSortMyTasks(e.target.value as any) : setSortAvailable(e.target.value as any)}
+              className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer appearance-none pr-4"
+            >
+              <option value="upvotes" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Most Rated</option>
+              <option value="newest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Newest First</option>
+              <option value="oldest" className="bg-white text-gray-900 dark:bg-slate-800 dark:text-white">Oldest First</option>
+            </select>
+          </div>
         </div>
       </div>
 
