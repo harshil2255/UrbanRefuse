@@ -149,16 +149,16 @@ export default function ReportIssueModal({ isOpen, onClose, onSuccess }: { isOpe
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm px-4 py-6 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-fade-in transition-colors my-auto">
-        <div className="flex justify-between items-center p-5 border-b border-gray-100 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 sm:p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-full animate-fade-in transition-colors">
+        <div className="flex justify-between items-center p-4 sm:p-5 border-b border-gray-100 dark:border-slate-700 shrink-0">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Report an Issue</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 overflow-y-auto">
           {error && (
             <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm dark:bg-red-900/20 dark:text-red-400">
               {error}

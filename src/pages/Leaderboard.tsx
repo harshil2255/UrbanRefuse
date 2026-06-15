@@ -88,60 +88,60 @@ export default function Leaderboard() {
         <div className="space-y-8">
           {/* Top 3 Podium */}
           {topThree.length > 0 && (
-            <div className="flex flex-col md:flex-row items-end justify-center gap-4 md:gap-8 mb-12 mt-12">
+            <div className="flex flex-row items-end justify-center gap-2 sm:gap-4 md:gap-8 mb-12 mt-8 md:mt-12 px-1">
               {/* 2nd Place */}
               {topThree[1] && (
-                <div className="flex flex-col items-center order-2 md:order-1 flex-1 max-w-[200px]">
-                  <div className="relative mb-4">
-                    <div className="w-20 h-20 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border-4 border-gray-300 shadow-lg z-10 relative">
-                      <span className="text-2xl font-bold text-gray-600 dark:text-gray-300">{topThree[1].full_name.charAt(0)}</span>
+                <div className="flex flex-col items-center order-1 flex-1 max-w-[120px] md:max-w-[200px]">
+                  <div className="relative mb-2 md:mb-4">
+                    <div className="w-14 h-14 md:w-20 md:h-20 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border-2 md:border-4 border-gray-300 shadow-lg z-10 relative">
+                      <span className="text-xl md:text-2xl font-bold text-gray-600 dark:text-gray-300">{topThree[1].full_name.charAt(0)}</span>
                     </div>
-                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gray-200 dark:bg-slate-600 rounded-full p-1 border-2 border-white dark:border-slate-800">
-                      <Medal size={20} className="text-gray-500" />
+                    <div className="absolute -bottom-2 md:-bottom-3 left-1/2 -translate-x-1/2 bg-gray-200 dark:bg-slate-600 rounded-full p-1 border-2 border-white dark:border-slate-800">
+                      <Medal size={16} className="text-gray-500 md:w-5 md:h-5" />
                     </div>
                   </div>
-                  <h3 className="font-bold text-gray-900 dark:text-white text-center text-lg">{topThree[1].full_name}</h3>
-                  <p className="text-emerald-600 dark:text-emerald-400 font-semibold">{topThree[1].reports_count} Reports</p>
-                  <div className="w-full h-24 bg-gradient-to-t from-gray-200 to-gray-50 dark:from-slate-700 dark:to-slate-800 rounded-t-xl mt-4 border-t-2 border-x-2 border-gray-300 dark:border-slate-600 flex items-center justify-center">
-                    <span className="text-3xl font-black text-gray-400/50 dark:text-slate-500/50">2</span>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-center text-xs md:text-lg truncate w-full px-1">{topThree[1].full_name}</h3>
+                  <p className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] md:text-base">{topThree[1].reports_count} Reports</p>
+                  <div className="w-full h-16 md:h-24 bg-gradient-to-t from-gray-200 to-gray-50 dark:from-slate-700 dark:to-slate-800 rounded-t-lg md:rounded-t-xl mt-2 md:mt-4 border-t-2 border-x-2 border-gray-300 dark:border-slate-600 flex items-center justify-center">
+                    <span className="text-2xl md:text-3xl font-black text-gray-400/50 dark:text-slate-500/50">2</span>
                   </div>
                 </div>
               )}
 
               {/* 1st Place */}
               {topThree[0] && (
-                <div className="flex flex-col items-center order-1 md:order-2 flex-1 max-w-[220px]">
-                  <div className="relative mb-4">
-                    <div className="w-24 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center border-4 border-yellow-200 shadow-xl z-10 relative">
-                      <span className="text-3xl font-bold text-yellow-900">{topThree[0].full_name.charAt(0)}</span>
+                <div className="flex flex-col items-center order-2 flex-1 max-w-[140px] md:max-w-[220px]">
+                  <div className="relative mb-2 md:mb-4">
+                    <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center border-2 md:border-4 border-yellow-200 shadow-xl z-10 relative">
+                      <span className="text-2xl md:text-3xl font-bold text-yellow-900">{topThree[0].full_name.charAt(0)}</span>
                     </div>
-                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-yellow-100 dark:bg-slate-800 rounded-full p-1.5 border-2 border-white dark:border-slate-800 shadow-md">
-                      <Trophy size={24} className="text-yellow-500" />
+                    <div className="absolute -bottom-3 md:-bottom-4 left-1/2 -translate-x-1/2 bg-yellow-100 dark:bg-slate-800 rounded-full p-1 md:p-1.5 border-2 border-white dark:border-slate-800 shadow-md">
+                      <Trophy size={18} className="text-yellow-500 md:w-6 md:h-6" />
                     </div>
                   </div>
-                  <h3 className="font-bold text-gray-900 dark:text-white text-center text-xl mt-2">{topThree[0].full_name}</h3>
-                  <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">{topThree[0].reports_count} Reports</p>
-                  <div className="w-full h-32 bg-gradient-to-t from-yellow-200 to-yellow-50 dark:from-yellow-900/40 dark:to-yellow-900/10 rounded-t-xl mt-4 border-t-2 border-x-2 border-yellow-400 dark:border-yellow-700/50 flex items-center justify-center">
-                    <span className="text-5xl font-black text-yellow-500/30 dark:text-yellow-500/20">1</span>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-center text-sm md:text-xl mt-1 md:mt-2 truncate w-full px-1">{topThree[0].full_name}</h3>
+                  <p className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px] md:text-lg">{topThree[0].reports_count} Reports</p>
+                  <div className="w-full h-24 md:h-32 bg-gradient-to-t from-yellow-200 to-yellow-50 dark:from-yellow-900/40 dark:to-yellow-900/10 rounded-t-lg md:rounded-t-xl mt-2 md:mt-4 border-t-2 border-x-2 border-yellow-400 dark:border-yellow-700/50 flex items-center justify-center">
+                    <span className="text-3xl md:text-5xl font-black text-yellow-500/30 dark:text-yellow-500/20">1</span>
                   </div>
                 </div>
               )}
 
               {/* 3rd Place */}
               {topThree[2] && (
-                <div className="flex flex-col items-center order-3 flex-1 max-w-[200px]">
-                  <div className="relative mb-4">
-                    <div className="w-20 h-20 bg-amber-50 dark:bg-slate-700 rounded-full flex items-center justify-center border-4 border-amber-600/40 shadow-lg z-10 relative">
-                      <span className="text-2xl font-bold text-amber-800 dark:text-amber-500">{topThree[2].full_name.charAt(0)}</span>
+                <div className="flex flex-col items-center order-3 flex-1 max-w-[120px] md:max-w-[200px]">
+                  <div className="relative mb-2 md:mb-4">
+                    <div className="w-14 h-14 md:w-20 md:h-20 bg-amber-50 dark:bg-slate-700 rounded-full flex items-center justify-center border-2 md:border-4 border-amber-600/40 shadow-lg z-10 relative">
+                      <span className="text-xl md:text-2xl font-bold text-amber-800 dark:text-amber-500">{topThree[2].full_name.charAt(0)}</span>
                     </div>
-                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-amber-100 dark:bg-slate-600 rounded-full p-1 border-2 border-white dark:border-slate-800">
-                      <Medal size={20} className="text-amber-700" />
+                    <div className="absolute -bottom-2 md:-bottom-3 left-1/2 -translate-x-1/2 bg-amber-100 dark:bg-slate-600 rounded-full p-1 border-2 border-white dark:border-slate-800">
+                      <Medal size={16} className="text-amber-700 md:w-5 md:h-5" />
                     </div>
                   </div>
-                  <h3 className="font-bold text-gray-900 dark:text-white text-center text-lg">{topThree[2].full_name}</h3>
-                  <p className="text-emerald-600 dark:text-emerald-400 font-semibold">{topThree[2].reports_count} Reports</p>
-                  <div className="w-full h-20 bg-gradient-to-t from-amber-100 to-orange-50 dark:from-slate-700 dark:to-slate-800 rounded-t-xl mt-4 border-t-2 border-x-2 border-amber-600/30 dark:border-slate-600 flex items-center justify-center">
-                    <span className="text-3xl font-black text-amber-600/20 dark:text-slate-500/50">3</span>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-center text-xs md:text-lg truncate w-full px-1">{topThree[2].full_name}</h3>
+                  <p className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] md:text-base">{topThree[2].reports_count} Reports</p>
+                  <div className="w-full h-12 md:h-20 bg-gradient-to-t from-amber-100 to-orange-50 dark:from-slate-700 dark:to-slate-800 rounded-t-lg md:rounded-t-xl mt-2 md:mt-4 border-t-2 border-x-2 border-amber-600/30 dark:border-slate-600 flex items-center justify-center">
+                    <span className="text-2xl md:text-3xl font-black text-amber-600/20 dark:text-slate-500/50">3</span>
                   </div>
                 </div>
               )}
